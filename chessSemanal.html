@@ -85,7 +85,7 @@
         return result;
     }
 
-    function printResults(partida) {
+    function printResults(partida, target) {
         lichessTable = document.getElementById("lichess");
         newTr = document.createElement("tr");
         lichessTable.appendChild(newTr);
@@ -97,7 +97,7 @@
         playerSelected = ""
         colorJugador = ""
 
-        if (targets.includes(player1)) {
+        if (target == player1) {
             playerSelected = player1
             colorJugador = "black"
         } else {
@@ -111,30 +111,30 @@
         // Fecha
         var newP = document.createElement("td");
         var fecha = new Date(partida.createdAt);
-        var formato = fecha.getHours() + ":" + fecha.getMinutes()
-        newP.textContent = formato
-        newTr.appendChild(newP);
+        var formato = fecha.getHours() + ":" + fecha.getMinutes();
+        // newP.textContent = formato
+        // newTr.appendChild(newP);
 
         // Duracion
         var newP = document.createElement("td");
         var duracionMili = partida.lastMoveAt - partida.createdAt;
         var duracion = (duracionMili / 60000).toFixed(2);
-        newP.textContent = duracion;
-        newTr.appendChild(newP);
+        // newP.textContent = duracion;
+        // newTr.appendChild(newP);
 
         // Resultado
-        var newP = document.createElement("td");
+        // var newP = document.createElement("td");
         var resultado = partida.players[colorJugador].ratingDiff;
-        newP.textContent = resultado;
+        // newP.textContent = resultado;
 
-        if (resultado > 0) {
-            newP.textContent = "+" + newP.textContent
-            newP.style.color = "green";
-        } else {
-            newP.style.color = "red";
-        }
+        // if (resultado > 0) {
+        //     newP.textContent = "+" + newP.textContent
+        //     newP.style.color = "green";
+        // } else {
+        //     newP.style.color = "red";
+        // }
 
-        newTr.appendChild(newP);
+        // newTr.appendChild(newP);
 
 
         // TOTAL DIA
@@ -157,7 +157,12 @@
             td_elo.id = "rowTotalElo" + playerSelected
             td_elo.textContent = 0;
             newTr.appendChild(td_elo)
+            diaTable.appendChild(newTr);
 
+            td_estado = document.createElement("td");
+            td_estado.id = "rowTotalEstado" + playerSelected
+            td_estado.textContent = "";
+            newTr.appendChild(td_estado)
             diaTable.appendChild(newTr);
         }
 
@@ -167,6 +172,17 @@
         td_duracion.textContent = (parseFloat(td_duracion.textContent) + parseFloat(duracion)).toFixed(2);
         td_elo.textContent = (parseFloat(td_elo.textContent) + parseFloat(resultado)).toFixed(2);
 
+        if (parseFloat(td_elo.textContent) <= -50) {
+            td_estado.textContent = "Ardiendo en el infierno";
+        } else if (parseFloat(td_elo.textContent) > -50 && parseFloat(td_elo.textContent) <= -20) {
+            td_estado.textContent = "Calentito";
+        } else if (parseFloat(td_elo.textContent) > -20 && parseFloat(td_elo.textContent) <= 20) {
+            td_estado.textContent = "Even Steven";
+        } else if (parseFloat(td_elo.textContent) > 20 && parseFloat(td_elo.textContent) <= 50) {
+            td_estado.textContent = "Fino filipino";
+        } else {
+            td_estado.textContent = "Arrasando";
+        }
     }
 
     async function processTargets(targets) {
@@ -177,7 +193,7 @@
                 console.log(arrayResults);
 
                 for (const partida of arrayResults) {
-                    printResults(partida);
+                    printResults(partida, target);
                 }
             } catch (error) {
                 console.error(`Error al procesar ${target}: ${error}`);
@@ -191,7 +207,7 @@
 
 <body>
 
-    <div style="display: inline-flex;">
+    <div style="display: inline-flex; display: none;">
         <table id="lichess">
             <th>Jugadores</th>
             <th>Hora</th>
@@ -206,6 +222,7 @@
             <th>Jugador</th>
             <th>Duracion(min)</th>
             <th>Elo</th>
+            <th>Estado</th>
         </table>
     </div>
 

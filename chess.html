@@ -84,7 +84,7 @@
         return result;
     }
 
-    function printResults(partida) {
+    function printResults(partida, target) {
         lichessTable = document.getElementById("lichess");
         newTr = document.createElement("tr");
         lichessTable.appendChild(newTr);
@@ -96,7 +96,7 @@
         playerSelected = ""
         colorJugador = ""
 
-        if (targets.includes(player1)) {
+        if (target == player1) {
             playerSelected = player1
             colorJugador = "black"
         } else {
@@ -176,7 +176,7 @@
                 console.log(arrayResults);
 
                 for (const partida of arrayResults) {
-                    printResults(partida);
+                    printResults(partida, target);
                 }
             } catch (error) {
                 console.error(`Error al procesar ${target}: ${error}`);
