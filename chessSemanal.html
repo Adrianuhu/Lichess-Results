@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+</head>
+
+<script>
+    const targets = ["Eu4ico", "Bon_javi5", "alexvv24", "xesconti"];
+
+    function cambioDinamico(ele) {
+        const eleId = ele.id;
+        const elementosSustituir = document.getElementsByClassName(eleId);
+
+        console.log(elementosSustituir);
+
+        for (let item of elementosSustituir) {
+            item.innerHTML = ele.innerHTML
+        }
+    }
+
+    function parseReader(texto) {
+        concatenado = "[";
+        concatenado += texto;
+        concatenado += "]";
+
+        concatenado = concatenado.replaceAll(/\s/g, '')
+
+        var find = '}{';
+        var re = new RegExp(find, 'g');
+        result = concatenado.replace(re, '},{');
+        try {
+            a = JSON.parse(result)
+        } catch (error) {
+            return []
+        }
+
+        return a;
+    }
+
+
+    async function getUser(usuario) {
+        try {
+            hoy = new Date();
+            semana = hoy.setDate(hoy.getDate() - 7);
+            url = "https://lichess.org/api/games/user/" + usuario + "?since=" + semana
+
+            const config = {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/x-ndjson'
+                }
+            }
+            const response = await fetch(url, config)
+            const json = await response;
+            if (response.ok) {
+                return json.body
+            } else {}
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async function fetchData(usuario) {
+        const body = await getUser(usuario);
+
+        result = "";
+
+        const reader = body.getReader();
+        while (true) {
+            const {
+                done,
+                value
+            } = await reader.read();
+            if (done) {
+                break;
+            }
+
+            result += new TextDecoder().decode(value)
+        }
+
+        return result;
+    }
+
+    function printResults(partida) {
+        lichessTable = document.getElementById("lichess");
+        newTr = document.createElement("tr");
+        lichessTable.appendChild(newTr);
+
+        // Jugadores
+        var newP = document.createElement("td");
+        player1 = partida.players.black.user.name
+        player2 = partida.players.white.user.name
+        playerSelected = ""
+        colorJugador = ""
+
+        if (targets.includes(player1)) {
+            playerSelected = player1
+            colorJugador = "black"
+        } else {
+            playerSelected = player2
+            colorJugador = "white"
+        };
+
+        newP.textContent = playerSelected
+        newTr.appendChild(newP);
+
+        // Fecha
+        var newP = document.createElement("td");
+        var fecha = new Date(partida.createdAt);
+        var formato = fecha.getHours() + ":" + fecha.getMinutes()
+        newP.textContent = formato
+        newTr.appendChild(newP);
+
+        // Duracion
+        var newP = document.createElement("td");
+        var duracionMili = partida.lastMoveAt - partida.createdAt;
+        var duracion = (duracionMili / 60000).toFixed(2);
+        newP.textContent = duracion;
+        newTr.appendChild(newP);
+
+        // Resultado
+        var newP = document.createElement("td");
+        var resultado = partida.players[colorJugador].ratingDiff;
+        newP.textContent = resultado;
+
+        if (resultado > 0) {
+            newP.textContent = "+" + newP.textContent
+            newP.style.color = "green";
+        } else {
+            newP.style.color = "red";
+        }
+
+        newTr.appendChild(newP);
+
+
+        // TOTAL DIA
+        var diaTable = document.getElementById("totalDia");
+
+        if (document.getElementById("rowTotal" + playerSelected) == null) {
+            newTr = document.createElement("tr");
+            newTr.id = "rowTotal" + playerSelected;
+
+            td_jugador = document.createElement("td");
+            td_jugador.textContent = playerSelected;
+            newTr.appendChild(td_jugador)
+
+            td_duracion = document.createElement("td");
+            td_duracion.id = "rowTotalDuracion" + playerSelected
+            td_duracion.textContent = 0;
+            newTr.appendChild(td_duracion)
+
+            td_elo = document.createElement("td");
+            td_elo.id = "rowTotalElo" + playerSelected
+            td_elo.textContent = 0;
+            newTr.appendChild(td_elo)
+
+            diaTable.appendChild(newTr);
+        }
+
+        td_duracion = document.getElementById("rowTotalDuracion" + playerSelected);
+        td_elo = document.getElementById("rowTotalElo" + playerSelected);
+
+        td_duracion.textContent = (parseFloat(td_duracion.textContent) + parseFloat(duracion)).toFixed(2);
+        td_elo.textContent = (parseFloat(td_elo.textContent) + parseFloat(resultado)).toFixed(2);
+
+    }
+
+    async function processTargets(targets) {
+        for (const target of targets) {
+            try {
+                const results = await fetchData(target);
+                const arrayResults = parseReader(results);
+                console.log(arrayResults);
+
+                for (const partida of arrayResults) {
+                    printResults(partida);
+                }
+            } catch (error) {
+                console.error(`Error al procesar ${target}: ${error}`);
+            }
+        }
+    }
+
+
+    processTargets(targets);
+</script>
+
+<body>
+
+    <div style="display: inline-flex;">
+        <table id="lichess">
+            <th>Jugadores</th>
+            <th>Hora</th>
+            <th>Duración(min)</th>
+            <th>Resultado</th>
+        </table>
+    </div>
+
+    <div style="display: inline-flex;">
+        <table id="totalDia" style="position: fixed; right: 0;">
+            <caption><b>Calentadas</b></caption>
+            <th>Jugador</th>
+            <th>Duracion(min)</th>
+            <th>Elo</th>
+        </table>
+    </div>
+
+</body>
+
+</html>
