@@ -46,7 +46,7 @@
         try {
             hoy = new Date();
             semana = hoy.setDate(hoy.getDate() - 7);
-            url = "https://lichess.org/api/games/user/" + usuario + "?since=" + semana + "&perfType=\"blitz,rapid\""
+            url = "https://lichess.org/api/games/user/" + usuario + "?since=" + semana + "&perfType=blitz"
 
             const config = {
                 method: 'GET',
