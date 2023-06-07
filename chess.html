@@ -104,6 +104,17 @@
             colorJugador = "white"
         };
 
+
+        // FILTRO BLITZ Y RAPIDAS
+        if (partida.speed != "blitz") return
+
+        // FILTRO HORA Y JUGADOR
+        var horaPartida = new Date(partida.createdAt).getHours();
+
+        if (playerSelected != "xesconti") {
+            if (horaPartida > 9 && horaPartida < 18) return;
+        }
+
         newP.textContent = playerSelected
         newTr.appendChild(newP);
 
@@ -175,7 +186,7 @@
                 const arrayResults = parseReader(results);
                 console.log(arrayResults);
 
-               
+
                 for (const partida of arrayResults) {
                     printResults(partida, target);
                 }
