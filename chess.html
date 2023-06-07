@@ -45,7 +45,7 @@
     async function getUser(usuario) {
         try {
             hoy = new Date().setHours(0, 0, 0, 0)
-            url = "https://lichess.org/api/games/user/" + usuario + "?since=" + hoy + "&perfType=blitz"
+            url = "https://lichess.org/api/games/user/" + usuario + "?since=" + hoy
 
             const config = {
                 method: 'GET',
