@@ -105,6 +105,10 @@
             colorJugador = "white"
         };
 
+
+        // FILTRO BLITZ Y RAPIDAS
+        if (partida.speed != "blitz") return
+
         newP.textContent = playerSelected
         newTr.appendChild(newP);
 
