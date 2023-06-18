@@ -154,6 +154,11 @@
             td_jugador.textContent = playerSelected;
             newTr.appendChild(td_jugador)
 
+            td_total = document.createElement("td");
+            td_total.id = "rowTotalCuenta" + playerSelected
+            td_total.textContent = 1;
+            newTr.appendChild(td_total)
+
             td_duracion = document.createElement("td");
             td_duracion.id = "rowTotalDuracion" + playerSelected
             td_duracion.textContent = 0;
@@ -167,9 +172,11 @@
             diaTable.appendChild(newTr);
         }
 
+        td_total = document.getElementById("rowTotalCuenta" + playerSelected);
         td_duracion = document.getElementById("rowTotalDuracion" + playerSelected);
         td_elo = document.getElementById("rowTotalElo" + playerSelected);
 
+        td_total.textContent = parseInt(td_total.textContent) + 1;
         td_duracion.textContent = (parseFloat(td_duracion.textContent) + parseFloat(duracion)).toFixed(2);
         td_elo.textContent = (parseFloat(td_elo.textContent) + parseFloat(resultado)).toFixed(2);
 
@@ -211,6 +218,7 @@
         <table id="totalDia" style="position: fixed; right: 0;">
             <caption><b>Calentadas</b></caption>
             <th>Jugador</th>
+            <th>#</th>
             <th>Duracion(min)</th>
             <th>Elo</th>
         </table>
